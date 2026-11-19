@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "control": {
     "namespace": "MODUS",
-    "name": "KIBewertungOverlay",
+    "name": "RichTextPreview",
     "displayName": "MODUS KI Bewertung Overlay",
     "description": "MODUS KI Bewertung",
     "template": "field-standard"

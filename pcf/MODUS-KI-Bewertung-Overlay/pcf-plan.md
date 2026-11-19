@@ -2,7 +2,7 @@
 
 ## Summary
 
-- **Control:** MODUS.KIBewertungOverlay
+- **Control:** MODUS.RichTextPreview
 - **Description:** MODUS KI Bewertung
 - **Template:** field-standard
 - **Recipe:** none

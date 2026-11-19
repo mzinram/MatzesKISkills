@@ -47,11 +47,10 @@ supports overflow for short viewports. PCF version `0.0.4` and solution
 version `1.0.0.3` include these corrections.
 
 The user still saw the internal PCF control name and an untranslated empty
-state in the form designer. The component identity is now
+state in the form designer. The component identity was changed to
 `MODUS.KIBewertungOverlay`, with only German (`1031`) PCF resources. The empty
-state says `Keine Bewertungsinformationen vorhanden.` PCF version is `0.0.5`
-and solution version is `1.0.0.4`. Existing form bindings to the previous
-identity may need to be switched to this new component after import.
+state says `Keine Bewertungsinformationen vorhanden.` PCF version was `0.0.5`
+and solution version was `1.0.0.4`.
 
 Final verification: all model-driven PCF gates passed (including nine unit
 tests and production build). The solution was cleaned and rebuilt as a German
@@ -61,3 +60,17 @@ empty-state and dialog labels. The refreshed ZIP is
 `artifacts/ModusTextPreview_managed.zip`. It has not been imported into the
 environment; the form binding and runtime scrolling still need an in-app
 check after the new component is added to the form.
+
+The designer then reported `initialize data failed for control:
+modus_MODUS.RichTextPreview`. That is the existing FormXML control identity.
+To preserve that binding, the constructor/class were restored to
+`RichTextPreview` while keeping the German display name/resources. The repair
+uses PCF version `0.0.6` and managed solution version `1.0.0.5`; import is
+required to restore the control in the environment.
+
+The compatibility repair passed the model-driven PCF gates, including lint,
+nine unit tests, and a production build. The managed solution was rebuilt and
+verified to register `modus_MODUS.RichTextPreview` with PCF version `0.0.6`,
+solution version `1.0.0.5`, and only the German (`1031`) resource. The package
+must still be imported into the environment; no environment write or runtime
+verification was performed.

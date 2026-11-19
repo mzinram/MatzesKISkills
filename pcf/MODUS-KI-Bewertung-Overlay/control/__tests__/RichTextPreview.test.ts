@@ -1,4 +1,4 @@
-import { KIBewertungOverlay } from "../RichTextPreview";
+import { RichTextPreview } from "../RichTextPreview";
 import { IInputs } from "../RichTextPreview/generated/ManifestTypes";
 import { mockContext, mockProperty } from "../test/pcf-context";
 
@@ -15,7 +15,7 @@ const STRINGS: Record<string, string> = {
 };
 
 function mount(raw: string | null | undefined, readable = true) {
-    const control = new KIBewertungOverlay();
+    const control = new RichTextPreview();
     const notify = jest.fn();
     const container = document.createElement("div");
     document.body.append(container);

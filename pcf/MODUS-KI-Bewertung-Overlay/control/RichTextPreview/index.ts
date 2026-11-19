@@ -10,7 +10,7 @@ const BLOCK_TAGS = new Set(["blockquote", "h1", "h2", "h3", "h4", "h5", "h6", "l
 const RESOURCE_TAGS = "audio|embed|iframe|img|object|source|track|video";
 const PREVIEW_LIMIT = 240;
 
-export class KIBewertungOverlay implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class RichTextPreview implements ComponentFramework.StandardControl<IInputs, IOutputs> {
     private container: HTMLDivElement | null = null;
     private preview: HTMLParagraphElement | null = null;
     private openButton: HTMLButtonElement | null = null;

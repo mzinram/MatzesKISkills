@@ -1,10 +1,14 @@
 # MODUS KI Bewertung Overlay
 
-`MODUS.KIBewertungOverlay` (Anzeigename: **MODUS KI Bewertung Overlay**) ist
+`MODUS.RichTextPreview` (Anzeigename: **MODUS KI Bewertung Overlay**) ist
 ein Standard-Feldsteuerelement für mehrzeilige Dataverse-Texte (`Multiple`) in
 modellgesteuerten Apps. Es zeigt eine kompakte Vorschau und öffnet den
 vollständigen Inhalt in einem barrierearmen Overlay. Das Steuerelement ist
 nur lesend und ändert das gebundene Feld nicht.
+
+Die technische PCF-Identität bleibt `MODUS.RichTextPreview`, damit vorhandene
+Formularbindungen erhalten bleiben. Der Anzeigename im Formular lautet
+**MODUS KI Bewertung Overlay**.
 
 Die Benutzeroberfläche ist ausschließlich auf Deutsch (`1031`) lokalisiert.
 Der leere Zustand lautet **Keine Bewertungsinformationen vorhanden.** Lange
