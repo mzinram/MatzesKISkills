@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "control": {
+    "namespace": "MODUS",
+    "name": "KIBewertungOverlay",
+    "displayName": "MODUS KI Bewertung Overlay",
+    "description": "MODUS KI Bewertung",
+    "template": "field-standard"
+  },
+  "hosts": ["model"],
+  "connectivity": "online",
+  "properties": [
+    {
+      "name": "text",
+      "usage": "bound",
+      "type": "Multiple",
+      "required": true
+    }
+  ],
+  "deploy": {
+    "solution": "ModusTextPreview",
+    "publisherPrefix": "modus"
+  },
+  "bindings": []
+}
