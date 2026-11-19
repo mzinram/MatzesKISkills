@@ -11,9 +11,21 @@ Formularbindungen erhalten bleiben. Der Anzeigename im Formular lautet
 **MODUS KI Bewertung Overlay**.
 
 Die Benutzeroberfläche ist ausschließlich auf Deutsch (`1031`) lokalisiert.
+Alle Laufzeitbeschriftungen sind zusätzlich direkt im Bundle hinterlegt:
+Auch bei fehlenden oder anderssprachigen Host-Ressourcen erscheinen keine
+internen Übersetzungsschlüssel oder englischen Buttons.
 Der leere Zustand lautet **Keine Bewertungsinformationen vorhanden.** Lange
 Bewertungen lassen sich im Overlay unabhängig scrollen; der Inhaltsbereich
 kann zum Scrollen auch per Tastatur fokussiert werden.
+
+Das Popup verwendet einen nativen modalen HTML-Dialog im Browser-Top-Layer.
+Es überdeckt die Ansichtsfläche der App und wird nicht durch Formularabschnitte,
+deren Überlauf oder Stapelkontexte begrenzt. Der Kopfbereich mit **Schließen**
+bleibt sichtbar, während der Inhalt per Mausrad, Touch oder Tastatur scrollt.
+Bei unverändertem Feldinhalt bleibt die Scrollposition auch nach
+`updateView` erhalten. Es werden weder das Host-DOM noch das übergeordnete
+Browserfenster verändert. In einer eingebetteten Vorschau begrenzt ein
+umschließendes iFrame weiterhin die verfügbare Ansichtsfläche.
 
 Das Overlay baut HTML aus einer strikten semantischen Allowlist neu auf.
 Skripte, Styles, eingebettete Ressourcen und unsichere Links werden entfernt;

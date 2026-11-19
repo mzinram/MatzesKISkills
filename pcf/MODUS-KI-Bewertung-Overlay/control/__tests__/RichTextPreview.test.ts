@@ -2,19 +2,29 @@ import { RichTextPreview } from "../RichTextPreview";
 import { IInputs } from "../RichTextPreview/generated/ManifestTypes";
 import { mockContext, mockProperty } from "../test/pcf-context";
 
+// jsdom has no dialog implementation; layout and top-layer behavior are checked in a real browser.
+beforeAll(() => {
+    Object.defineProperties(HTMLDialogElement.prototype, {
+        showModal: {
+            configurable: true,
+            value: function (this: HTMLDialogElement) { this.setAttribute("open", ""); },
+        },
+        close: {
+            configurable: true,
+            value: function (this: HTMLDialogElement) { this.removeAttribute("open"); },
+        },
+    });
+});
+
 afterEach(() => {
     document.body.replaceChildren();
 });
 
-const STRINGS: Record<string, string> = {
-    KIBewertungOverlay_Open: "Vollständige KI-Bewertung anzeigen",
-    KIBewertungOverlay_Close: "Schließen",
-    KIBewertungOverlay_DialogTitle: "MODUS KI Bewertung",
-    KIBewertungOverlay_Empty: "Keine Bewertungsinformationen vorhanden.",
-    KIBewertungOverlay_PermissionDenied: "Sie haben keine Berechtigung, diese Bewertung zu lesen.",
-};
-
-function mount(raw: string | null | undefined, readable = true) {
+function mount(
+    raw: string | null | undefined,
+    readable = true,
+    resolveResource: (key: string) => string = (key) => key,
+) {
     const control = new RichTextPreview();
     const notify = jest.fn();
     const container = document.createElement("div");
@@ -25,18 +35,19 @@ function mount(raw: string | null | undefined, readable = true) {
     const context = mockContext<IInputs>(parameters);
     (context as ComponentFramework.Context<IInputs> & { resources: ComponentFramework.Resources }).resources = {
         getResource: (_id: string, success: (data: string) => void) => success(""),
-        getString: (key: string) => STRINGS[key] ?? key,
+        getString: resolveResource,
     } as ComponentFramework.Resources;
 
     control.init(context, notify, {}, container);
 
     return {
         control,
+        context,
         notify,
         container,
         preview: () => container.querySelector(".richtextpreview-preview") as HTMLParagraphElement,
         openButton: () => container.querySelector(".richtextpreview-open") as HTMLButtonElement,
-        overlay: () => container.querySelector(".richtextpreview-overlay") as HTMLDivElement,
+        overlay: () => container.querySelector(".richtextpreview-overlay") as HTMLDialogElement,
         content: () => container.querySelector(".richtextpreview-content") as HTMLDivElement,
         closeButton: () => container.querySelector(".richtextpreview-close") as HTMLButtonElement,
     };
@@ -60,7 +71,7 @@ test("long HTML is compacted in the field and the complete allowed formatting op
     expect(mounted.openButton().hidden).toBe(false);
     mounted.openButton().click();
 
-    expect(mounted.overlay().hidden).toBe(false);
+    expect(mounted.overlay().open).toBe(true);
     expect(mounted.content().querySelector("strong")?.textContent).toBe("A".repeat(260));
     expect(mounted.content().querySelector("em")?.textContent).toBe("Abschluss");
     expect(mounted.content().tabIndex).toBe(0);
@@ -110,7 +121,7 @@ test("overlay closes on Escape, traps focus and restores focus to its opener", (
 
     const escape = new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
     mounted.overlay().dispatchEvent(escape);
-    expect(mounted.overlay().hidden).toBe(true);
+    expect(mounted.overlay().open).toBe(false);
     expect(document.activeElement).toBe(mounted.openButton());
 
     mounted.openButton().focus();
@@ -134,8 +145,8 @@ test("two instances keep independent overlays and do not duplicate dialog IDs", 
 
     first.openButton().click();
 
-    expect(first.overlay().hidden).toBe(false);
-    expect(second.overlay().hidden).toBe(true);
+    expect(first.overlay().open).toBe(true);
+    expect(second.overlay().open).toBe(false);
     expect(first.container.querySelector("[id]")).toBeNull();
     expect(second.container.querySelector("[id]")).toBeNull();
 });
@@ -143,10 +154,77 @@ test("two instances keep independent overlays and do not duplicate dialog IDs", 
 test("destroy removes the control DOM and event behavior", () => {
     const mounted = mount("Existing assessment");
     const button = mounted.openButton();
+    const dialog = mounted.overlay();
+    button.click();
 
     mounted.control.destroy();
     button.click();
 
     expect(mounted.container.childElementCount).toBe(0);
+    expect(dialog.open).toBe(false);
     expect(mounted.notify).not.toHaveBeenCalled();
+});
+
+test.each([
+    ["unresolved resource keys", (key: string) => key],
+    ["empty resources", () => ""],
+    ["English resources", () => "Read more"],
+    ["a resource lookup error", () => { throw new Error("Resource not available"); }],
+])("all runtime labels stay German with %s", (_description, resolveResource) => {
+    const mounted = mount("Bewertung", true, resolveResource);
+    const empty = mount(null, true, resolveResource);
+    const denied = mount("Vertraulich", false, resolveResource);
+
+    expect(mounted.openButton().textContent).toBe("Vollständige KI-Bewertung anzeigen");
+    mounted.openButton().click();
+    expect(mounted.closeButton().textContent).toBe("Schließen");
+    expect(mounted.overlay().getAttribute("aria-label")).toBe("MODUS KI Bewertung");
+    expect(mounted.overlay().querySelector("h2")?.textContent).toBe("MODUS KI Bewertung");
+    expect(empty.preview().textContent).toBe("Keine Bewertungsinformationen vorhanden.");
+    expect(denied.container.textContent).toContain("Sie haben keine Berechtigung, diese Bewertung zu lesen.");
+    expect(mounted.container.textContent).not.toContain("KIBewertungOverlay_");
+});
+
+test("native dialog cancellation closes the overlay and restores the opener", () => {
+    const mounted = mount("Bewertung");
+    mounted.openButton().focus();
+    mounted.openButton().click();
+    const cancel = new Event("cancel", { cancelable: true });
+
+    mounted.overlay().dispatchEvent(cancel);
+
+    expect(cancel.defaultPrevented).toBe(true);
+    expect(mounted.overlay().open).toBe(false);
+    expect(mounted.openButton().getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(mounted.openButton());
+});
+
+test("host updates preserve the reader's position unless the field content changes", () => {
+    const mounted = mount("<p>Bewertung</p>");
+    mounted.openButton().click();
+    const paragraph = mounted.content().firstChild;
+    mounted.content().scrollTop = 42;
+
+    mounted.control.updateView(mounted.context);
+
+    expect(mounted.content().firstChild).toBe(paragraph);
+    expect(mounted.content().scrollTop).toBe(42);
+    mounted.context.parameters.text.raw = "Neue Bewertung";
+    mounted.control.updateView(mounted.context);
+    expect(mounted.content().textContent).toBe("Neue Bewertung");
+    expect(mounted.content().scrollTop).toBe(0);
+});
+
+test("revoked read permission clears and closes an open assessment", () => {
+    const mounted = mount("Vertrauliche Bewertung");
+    mounted.openButton().click();
+    const restricted = mockContext<IInputs>({
+        text: mockProperty("Vertrauliche Bewertung", undefined, { readable: false }) as IInputs["text"],
+    });
+
+    mounted.control.updateView(restricted);
+
+    expect(mounted.overlay().open).toBe(false);
+    expect(mounted.content().textContent).toBe("");
+    expect(mounted.container.textContent).not.toContain("Vertrauliche Bewertung");
 });

@@ -7,9 +7,11 @@ Textfelds und öffnet den vollständigen Inhalt auf Knopfdruck in einem Overlay.
 ## Funktionen
 
 - Kompakte Textvorschau mit Schaltfläche **Vollständige KI-Bewertung anzeigen**
-- Scrollbares, per Tastatur bedienbares Overlay
+- Modales Popup über der gesamten App-Ansichtsfläche, oberhalb des Formulars
+- Separater Scrollbereich bei festem Kopfbereich mit Schließen-Button
 - Darstellung von sicher gefiltertem HTML
-- Deutschsprachige Oberfläche und leerer Zustand
+- Verbindlich deutsche Buttons, Dialogtitel und Hinweistexte, auch ohne
+  funktionierende Übersetzungsressourcen des Hosts
 - Reine Anzeige: Das Steuerelement verändert den Datensatz und das gebundene
   Feld nicht
 
@@ -26,13 +28,19 @@ eingebettete Ressourcen und unsichere URLs werden verworfen.
 | PCF-Identität | `modus_MODUS.RichTextPreview` |
 | Anzeigename | MODUS KI Bewertung Overlay |
 | Beschreibung | MODUS KI Bewertung |
-| PCF-Version | `0.0.6` |
-| Managed-Solution-Version | `1.0.0.5` |
+| PCF-Version | `0.0.7` |
+| Managed-Solution-Version | `1.0.0.6` |
 | Sprache | Deutsch (`1031`) |
 
 Die technische Identität `MODUS.RichTextPreview` bleibt absichtlich stabil, um
 bestehende Formularbindungen beizubehalten. Der Anzeigename im Formular ist
 **MODUS KI Bewertung Overlay**.
+
+Das Popup nutzt den nativen modalen HTML-Dialog (`showModal`) im Browser-Top-Layer.
+Dadurch wird es nicht von Formularabschnitten oder deren Überlauf begrenzt.
+Es wird kein Host-DOM und kein übergeordnetes Fenster manipuliert. In einer
+eingebetteten iFrame-Vorschau begrenzt weiterhin das iFrame die Ansichtsfläche.
+Verwende einen aktuellen Browser mit Unterstützung für native HTML-Dialoge.
 
 ## Installation
 
@@ -49,6 +57,29 @@ bestehende Formularbindungen beizubehalten. Der Anzeigename im Formular ist
 Das Paket enthält das PCF, aber keine Formularbindung. Die Bindung wird in der
 Zielumgebung vorgenommen. Nach dem Import ist daher ein Speichern und
 Veröffentlichen des Formulars erforderlich.
+
+## Update einer vorhandenen Installation
+
+Importiere die Managed Solution `1.0.0.6` als Aktualisierung der vorhandenen
+Lösung `ModusTextPreview`. Die technische Identität und die gebundene Eigenschaft
+bleiben unverändert; eine bestehende Bindung an `modus_MODUS.RichTextPreview`
+muss nicht entfernt werden. Veröffentliche erforderliche Formularänderungen
+und lade die App anschließend mit `Strg+F5` neu, damit nicht das alte Bundle
+aus dem Browsercache verwendet wird.
+
+## Änderungen in 1.0.0.6
+
+Die Buttons und Hinweistexte sind unabhängig von der Host-Ressourcenauflösung
+auf Deutsch. Der bisherige formularinterne Overlay-Container wurde durch einen
+nativen modalen Dialog ersetzt. Der Inhalt lässt sich bis zum Ende scrollen,
+während der Dialogkopf sichtbar bleibt; unveränderte Host-Updates setzen die
+Leseposition nicht mehr zurück.
+
+Die PCF-Gates mit 16 Tests und Produktionsbuild sowie eine lokale
+Browserprüfung bei Desktop- und schmaler Ansichtsgröße sind erfolgreich.
+Die Browserprüfung umfasst Mausrad, Tastatur, Scrollen bis zum Textende und
+Darstellung oberhalb eines begrenzten Formularbereichs. Ein Import und eine
+Laufzeitprüfung in einer Dynamics-Zielumgebung stehen noch aus.
 
 ## Quellcode und lokale Prüfungen
 

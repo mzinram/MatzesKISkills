@@ -74,3 +74,33 @@ verified to register `modus_MODUS.RichTextPreview` with PCF version `0.0.6`,
 solution version `1.0.0.5`, and only the German (`1031`) resource. The package
 must still be imported into the environment; no environment write or runtime
 verification was performed.
+
+Unattended default: Release target for the follow-up fix -> reuse
+`ModusTextPreview`, publisher `modus`, and the existing private repository
+branch (the user requested corrections to the same reusable control).
+No environment import or form write is authorized or performed.
+
+Version `0.0.7` / managed solution `1.0.0.6` fixes unresolved runtime labels
+by bundling the requested German-only UI strings instead of displaying
+resource lookup keys. The manifest retains the German metadata resource
+and stable `MODUS.RichTextPreview` constructor.
+
+The overlay now uses `HTMLDialogElement.showModal()` in the browser top
+layer, without appending nodes to the host DOM or accessing parent frames.
+Its viewport-sized surface contains a height-bounded flex panel, fixed
+header, and independently scrollable content with an explicit vertical
+scrollbar. Unchanged host updates preserve scroll position; changed values
+reset it. Closing, cancellation, permission loss, and destroy clean up
+the modal and restore focus.
+
+Verification: all PCF gates passed with 16 tests and a production build.
+Strict manifest comparison against the released `0.0.6` contract reported
+no breaking changes. A real Chromium browser loaded the production bundle
+inside a transformed, paint-contained, clipped 460-by-240 form simulation,
+with a high-z-index application header. At 2560-by-1038 and 390-by-480 the
+dialog covered the viewport, escaped the form bounds, kept the header
+visible, and reached the final paragraph of 100 long HTML sections.
+Mouse-wheel, PageDown, Ctrl+End, Escape, focus restoration, background
+inertness, and unchanged-update scroll preservation passed.
+This is local browser evidence, not a Dynamics environment runtime check;
+the target environment remains runtime-not-checked.
