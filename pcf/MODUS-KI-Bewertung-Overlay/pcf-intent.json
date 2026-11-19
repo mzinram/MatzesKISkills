@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "control": {
+    "namespace": "MODUS",
+    "name": "RichTextPreview",
+    "displayName": "MODUS KI Bewertung Overlay",
+    "description": "MODUS KI Bewertung",
+    "template": "field-standard"
+  },
+  "hosts": ["model"],
+  "connectivity": "online",
+  "properties": [
+    {
+      "name": "text",
+      "usage": "bound",
+      "type": "Multiple",
+      "required": true
+    },
+    {
+      "name": "summary",
+      "usage": "bound",
+      "type": "Multiple",
+      "required": false
+    }
+  ],
+  "deploy": {
+    "solution": "ModusTextPreview",
+    "publisherPrefix": "modus"
+  },
+  "bindings": []
+}

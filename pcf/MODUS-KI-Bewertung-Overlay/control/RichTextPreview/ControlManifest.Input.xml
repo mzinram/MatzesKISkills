@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="MODUS" constructor="RichTextPreview" version="0.0.9" display-name-key="KIBewertungOverlay" description-key="KIBewertungOverlay_Description" control-type="standard">
+    <external-service-usage enabled="false" />
+    <property name="text" display-name-key="Property_Display_Key" description-key="Property_Desc_Key" of-type="Multiple" usage="bound" required="true" />
+    <property name="summary" display-name-key="Summary_Display_Key" description-key="Summary_Desc_Key" of-type="Multiple" usage="bound" required="false" />
+    <resources>
+      <code path="index.ts" order="1" />
+      <css path="css/RichTextPreview.css" order="1" />
+      <resx path="strings/KIBewertungOverlay.1031.resx" version="1.0.2" />
+    </resources>
+    <!-- Features are declared only when this control's code uses them. -->
+  </control>
+</manifest>
