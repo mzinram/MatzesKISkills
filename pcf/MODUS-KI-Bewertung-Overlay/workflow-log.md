@@ -104,3 +104,9 @@ Mouse-wheel, PageDown, Ctrl+End, Escape, focus restoration, background
 inertness, and unchanged-update scroll preservation passed.
 This is local browser evidence, not a Dynamics environment runtime check;
 the target environment remains runtime-not-checked.
+
+## 1.0.0.7 / PCF 0.0.8 – kompakte HTML-Darstellung
+- Ursache: white-space: pre-wrap plus zusätzliche Zeilenumbrüche nach Blockelementen und leere Absätze erzeugten große Lücken.
+- Fix: HTML normal umbrechen, Klartext weiter pre-wrap; leere p/div/span/h* entfernen; div/span/hr erlaubt; einheitliche Abstände.
+- Gates grün (18 Tests); Browserprüfung 2000x716: Abstände 8-20 px, letzter Absatz nach Scrollen sichtbar.
+- Dynamics-Laufzeit: runtime-not-checked.

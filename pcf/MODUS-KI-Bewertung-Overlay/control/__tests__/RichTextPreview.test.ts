@@ -228,3 +228,20 @@ test("revoked read permission clears and closes an open assessment", () => {
     expect(mounted.content().textContent).toBe("");
     expect(mounted.container.textContent).not.toContain("Vertrauliche Bewertung");
 });
+
+test("HTML assessments render compactly without source-whitespace gaps or empty paragraphs", () => {
+    const value = "<h3>3. Zielbranche</h3>\n\n<p>&nbsp;</p>\n<div><strong>Ampel:</strong><br>GRÜN</div>\n\n\n<p><strong>Branche:</strong> Maschinenbau</p>";
+    const mounted = mount(value);
+
+    expect(mounted.content().classList.contains("richtextpreview-content--plain")).toBe(false);
+    expect(mounted.content().querySelectorAll("p")).toHaveLength(1);
+    expect(mounted.content().querySelector("div strong")?.textContent).toBe("Ampel:");
+    expect(mounted.preview().textContent).toBe("3. Zielbranche Ampel: GRÜN Branche: Maschinenbau");
+});
+
+test("plain-text assessments keep their line breaks", () => {
+    const mounted = mount("Ampel: GRÜN\nBranche: Maschinenbau");
+
+    expect(mounted.content().classList.contains("richtextpreview-content--plain")).toBe(true);
+    expect(mounted.content().textContent).toBe("Ampel: GRÜN\nBranche: Maschinenbau");
+});

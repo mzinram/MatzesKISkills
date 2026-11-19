@@ -137,7 +137,59 @@
   overflow-wrap: anywhere;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  white-space: normal;
+}
+
+.richtextpreview-content--plain {
   white-space: pre-wrap;
+}
+
+.richtextpreview-content p,
+.richtextpreview-content ul,
+.richtextpreview-content ol,
+.richtextpreview-content blockquote,
+.richtextpreview-content table,
+.richtextpreview-content pre {
+  margin: 0 0 0.75rem;
+}
+
+.richtextpreview-content h1,
+.richtextpreview-content h2,
+.richtextpreview-content h3,
+.richtextpreview-content h4,
+.richtextpreview-content h5,
+.richtextpreview-content h6 {
+  margin: 1.25rem 0 0.5rem;
+  color: #00305d;
+  line-height: 1.3;
+}
+
+.richtextpreview-content h1 { font-size: 1.375rem; }
+.richtextpreview-content h2 { font-size: 1.25rem; }
+.richtextpreview-content h3 { font-size: 1.125rem; }
+.richtextpreview-content h4,
+.richtextpreview-content h5,
+.richtextpreview-content h6 { font-size: 1rem; }
+
+.richtextpreview-content ul,
+.richtextpreview-content ol {
+  padding-left: 1.5rem;
+}
+
+.richtextpreview-content li {
+  margin: 0.125rem 0;
+}
+
+.richtextpreview-content hr {
+  margin: 1rem 0;
+  border: 0;
+  border-top: 1px solid #dce5eb;
+}
+
+.richtextpreview-content::after {
+  content: "";
+  display: block;
+  height: 0.5rem;
 }
 
 .richtextpreview-content pre {

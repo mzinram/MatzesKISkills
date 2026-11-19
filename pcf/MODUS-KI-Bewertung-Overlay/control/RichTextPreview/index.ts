@@ -2,11 +2,13 @@ import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import "./css/RichTextPreview.css";
 
 const ALLOWED_TAGS = new Set([
-    "a", "b", "blockquote", "br", "code", "em", "h1", "h2", "h3", "h4", "h5", "h6",
-    "i", "li", "ol", "p", "pre", "s", "strong", "table", "tbody", "td", "th", "thead",
+    "a", "b", "blockquote", "br", "code", "div", "em", "h1", "h2", "h3", "h4", "h5", "h6",
+    "hr", "i", "li", "ol", "p", "pre", "s", "span", "strong", "table", "tbody", "td", "th", "thead",
     "tr", "u", "ul",
 ]);
-const BLOCK_TAGS = new Set(["blockquote", "h1", "h2", "h3", "h4", "h5", "h6", "li", "ol", "p", "pre", "table", "tr", "ul"]);
+const BLOCK_TAGS = new Set(["blockquote", "div", "h1", "h2", "h3", "h4", "h5", "h6", "li", "ol", "p", "pre", "table", "tr", "ul"]);
+const EMPTY_REMOVABLE_TAGS = new Set(["div", "h1", "h2", "h3", "h4", "h5", "h6", "p", "span"]);
+const HTML_PATTERN = /<\/?[a-z][a-z0-9]*\b[^>]*>/i;
 const RESOURCE_TAGS = "audio|embed|iframe|img|object|source|track|video";
 const PREVIEW_LIMIT = 240;
 // This control intentionally has a German-only runtime UI, independent of host resource resolution.
@@ -165,6 +167,7 @@ export class RichTextPreview implements ComponentFramework.StandardControl<IInpu
         this.message.hidden = this.canRead;
         this.message.textContent = this.canRead ? "" : LABELS.permissionDenied;
         if (valueChanged) {
+            this.dialogContent.classList.toggle("richtextpreview-content--plain", !HTML_PATTERN.test(this.value));
             this.dialogContent.replaceChildren(sanitized);
             this.dialogContent.scrollTop = 0;
         }
@@ -242,9 +245,14 @@ function appendSafeChildren(source: Node, target: Node): void {
             }
         }
         appendSafeChildren(child, safeElement);
+        if (EMPTY_REMOVABLE_TAGS.has(tag) && isVisuallyEmpty(safeElement)) return;
         target.appendChild(safeElement);
-        if (BLOCK_TAGS.has(tag)) target.appendChild(document.createTextNode("\n"));
     });
+}
+
+function isVisuallyEmpty(element: Element): boolean {
+    return (element.textContent ?? "").replace(/[\s\u00a0\u200b]/g, "") === ""
+        && !element.querySelector("hr, table");
 }
 
 function getSafeHref(value: string | null): string | null {
@@ -258,5 +266,20 @@ function getSafeHref(value: string | null): string | null {
 }
 
 function getPlainText(fragment: DocumentFragment): string {
-    return (fragment.textContent ?? "").replace(/\s+/g, " ").trim();
+    const parts: string[] = [];
+    const walk = (node: Node): void => {
+        node.childNodes.forEach((child) => {
+            if (child.nodeType === Node.TEXT_NODE) {
+                parts.push(child.textContent ?? "");
+                return;
+            }
+            if (!(child instanceof Element)) return;
+            const isBlock = BLOCK_TAGS.has(child.tagName.toLowerCase()) || child.tagName === "BR";
+            if (isBlock) parts.push(" ");
+            walk(child);
+            if (isBlock) parts.push(" ");
+        });
+    };
+    walk(fragment);
+    return parts.join("").replace(/\s+/g, " ").trim();
 }

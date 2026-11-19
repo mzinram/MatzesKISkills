@@ -28,8 +28,8 @@ eingebettete Ressourcen und unsichere URLs werden verworfen.
 | PCF-Identität | `modus_MODUS.RichTextPreview` |
 | Anzeigename | MODUS KI Bewertung Overlay |
 | Beschreibung | MODUS KI Bewertung |
-| PCF-Version | `0.0.7` |
-| Managed-Solution-Version | `1.0.0.6` |
+| PCF-Version | `0.0.8` |
+| Managed-Solution-Version | `1.0.0.7` |
 | Sprache | Deutsch (`1031`) |
 
 Die technische Identität `MODUS.RichTextPreview` bleibt absichtlich stabil, um
@@ -60,12 +60,25 @@ Veröffentlichen des Formulars erforderlich.
 
 ## Update einer vorhandenen Installation
 
-Importiere die Managed Solution `1.0.0.6` als Aktualisierung der vorhandenen
+Importiere die Managed Solution `1.0.0.7` als Aktualisierung der vorhandenen
 Lösung `ModusTextPreview`. Die technische Identität und die gebundene Eigenschaft
 bleiben unverändert; eine bestehende Bindung an `modus_MODUS.RichTextPreview`
 muss nicht entfernt werden. Veröffentliche erforderliche Formularänderungen
 und lade die App anschließend mit `Strg+F5` neu, damit nicht das alte Bundle
 aus dem Browsercache verwendet wird.
+
+## Änderungen in 1.0.0.7
+
+HTML-Bewertungen werden im Overlay kompakt dargestellt. Zeilenumbrüche aus dem
+HTML-Quelltext und leere Absätze (z. B. `<p>&nbsp;</p>`) erzeugen keine großen
+Leerräume mehr; Überschriften, Absätze und Listen haben einheitliche Abstände.
+Reiner Text ohne HTML behält seine Zeilenumbrüche. `div`, `span` und `hr` werden
+als sichere Struktur-Elemente übernommen. Der letzte Absatz ist nach dem Scrollen
+vollständig sichtbar.
+
+Die PCF-Gates mit 18 Tests und Produktionsbuild sowie eine lokale Browserprüfung
+sind erfolgreich. Ein Import und eine Laufzeitprüfung in einer Dynamics-Zielumgebung
+stehen noch aus.
 
 ## Änderungen in 1.0.0.6
 
