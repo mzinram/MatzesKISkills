@@ -18,6 +18,7 @@ const LABELS = {
     title: "MODUS KI Bewertung",
     empty: "Keine Bewertungsinformationen vorhanden.",
     permissionDenied: "Sie haben keine Berechtigung, diese Bewertung zu lesen.",
+    summaryPermissionDenied: "Sie haben keine Berechtigung, diese Zusammenfassung zu lesen.",
 };
 
 export class RichTextPreview implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -153,19 +154,27 @@ export class RichTextPreview implements ComponentFramework.StandardControl<IInpu
 
         const hasText = this.value.trim().length > 0;
         const sanitized = sanitizeHtml(this.value);
-        const plainText = getPlainText(sanitized);
-        const compactText = plainText.length > PREVIEW_LIMIT
+        const summary = context.parameters.summary;
+        const canReadSummary = summary?.security?.readable ?? true;
+        const summaryValue = canReadSummary ? summary?.raw ?? "" : "";
+        const hasSummary = summaryValue.trim().length > 0;
+        const canReadPreview = canReadSummary && (hasSummary || this.canRead);
+        const plainText = hasSummary ? getPlainText(sanitizeHtml(summaryValue)) : getPlainText(sanitized);
+        const compactText = !hasSummary && plainText.length > PREVIEW_LIMIT
             ? `${plainText.slice(0, PREVIEW_LIMIT).trimEnd()}…`
             : plainText;
 
-        this.preview.textContent = this.canRead
-            ? (hasText ? compactText : LABELS.empty)
+        this.preview.textContent = canReadPreview
+            ? (hasSummary || hasText ? compactText : LABELS.empty)
             : "";
-        this.preview.hidden = !this.canRead;
+        this.preview.hidden = !canReadPreview;
+        this.preview.classList.toggle("richtextpreview-preview--summary", hasSummary);
         this.openButton.hidden = !this.canRead || !hasText;
         this.openButton.disabled = !hasText;
-        this.message.hidden = this.canRead;
-        this.message.textContent = this.canRead ? "" : LABELS.permissionDenied;
+        this.message.hidden = canReadSummary && this.canRead;
+        this.message.textContent = !canReadSummary
+            ? LABELS.summaryPermissionDenied
+            : (this.canRead ? "" : LABELS.permissionDenied);
         if (valueChanged) {
             this.dialogContent.classList.toggle("richtextpreview-content--plain", !HTML_PATTERN.test(this.value));
             this.dialogContent.replaceChildren(sanitized);

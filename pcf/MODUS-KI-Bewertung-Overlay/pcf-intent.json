@@ -15,6 +15,12 @@
       "usage": "bound",
       "type": "Multiple",
       "required": true
+    },
+    {
+      "name": "summary",
+      "usage": "bound",
+      "type": "Multiple",
+      "required": false
     }
   ],
   "deploy": {

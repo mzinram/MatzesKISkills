@@ -35,6 +35,29 @@ Absolute HTTP(S)- und `mailto:`-Links öffnen sich geschützt in einem neuen Tab
 Das Erscheinungsbild nutzt die Farben von MODUS Consult: Navy `#00305D`, Rot
 `#E2001A`, Dunkelblau `#020F27`, Grau `#768999`, Hellblau `#F2F8FB` und Weiß.
 
+## Zwei Felder konfigurieren
+
+Das PCF wird weiterhin auf dem Multiline-Feld mit der vollständigen Bewertung
+eingebunden. Im Komponenten-Dialog lassen sich zwei Eigenschaften zuordnen:
+
+| Eigenschaft | Verwendung |
+| --- | --- |
+| **Overlayinformationen** (`text`, erforderlich) | Multiline-Feld für den vollständigen Inhalt im Popup. Die bisherige Bindung bleibt bestehen. |
+| **Zusammenfassung** (`summary`, optional) | Zweites Multiline-Feld für den Text auf dem Formular. Ein gefüllter Wert wird als sicherer Klartext vollständig angezeigt, ohne die bisherige 240-Zeichen-Kürzung oder Höhenbegrenzung. |
+
+Ohne Zuordnung oder bei leerer Zusammenfassung wird wie bisher eine gekürzte
+Vorschau der Overlayinformationen angezeigt. Bei fehlender Leseberechtigung
+für die Zusammenfassung erscheint stattdessen ein deutscher Berechtigungshinweis;
+es wird nicht auf die Vorschau des anderen Felds ausgewichen.
+Beide Felder werden unabhängig auf Leseberechtigung geprüft. Eine lesbare
+Zusammenfassung kann auch ohne verfügbare Overlayinformationen angezeigt werden;
+der Öffnen-Button ist dann ausgeblendet. Änderungen der Zusammenfassung setzen
+die Scrollposition im bereits geöffneten Overlay nicht zurück.
+
+Nach dem Import die Komponenteneigenschaften am Formular öffnen,
+**Zusammenfassung** an das zweite Feld derselben Tabelle binden und das
+Formular speichern und veröffentlichen. Das PCF schreibt in keines der Felder.
+
 ## Lokale Prüfungen
 
 Die PCF-Prüfungen aus dem Repository-Stammverzeichnis starten:

@@ -17,6 +17,7 @@
 | Name | Usage | Type | Required | Default |
 | --- | --- | --- | --- | --- |
 | text | bound | Multiple | yes |  |
+| summary | bound | Multiple | no |  |
 
 ## Bindings
 

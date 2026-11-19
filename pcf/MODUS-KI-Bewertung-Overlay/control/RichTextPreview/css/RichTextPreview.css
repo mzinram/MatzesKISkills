@@ -23,6 +23,11 @@
   overflow-wrap: anywhere;
 }
 
+.richtextpreview-preview--summary {
+  max-height: none;
+  overflow: visible;
+}
+
 .richtextpreview-open,
 .richtextpreview-close {
   min-height: 2.25rem;

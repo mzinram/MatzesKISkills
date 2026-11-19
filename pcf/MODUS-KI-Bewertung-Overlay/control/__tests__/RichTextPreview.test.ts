@@ -24,6 +24,7 @@ function mount(
     raw: string | null | undefined,
     readable = true,
     resolveResource: (key: string) => string = (key) => key,
+    summary?: { raw: string | null; readable?: boolean },
 ) {
     const control = new RichTextPreview();
     const notify = jest.fn();
@@ -32,7 +33,10 @@ function mount(
     const parameters = raw === undefined
         ? {}
         : { text: mockProperty(raw, undefined, { readable }) as IInputs["text"] };
-    const context = mockContext<IInputs>(parameters);
+    const context = mockContext<IInputs>({
+        ...parameters,
+        ...(summary ? { summary: mockProperty(summary.raw, undefined, { readable: summary.readable }) as IInputs["summary"] } : {}),
+    });
     (context as ComponentFramework.Context<IInputs> & { resources: ComponentFramework.Resources }).resources = {
         getResource: (_id: string, success: (data: string) => void) => success(""),
         getString: resolveResource,
@@ -244,4 +248,95 @@ test("plain-text assessments keep their line breaks", () => {
 
     expect(mounted.content().classList.contains("richtextpreview-content--plain")).toBe(true);
     expect(mounted.content().textContent).toBe("Ampel: GRÜN\nBranche: Maschinenbau");
+});
+
+test("a separate summary is displayed in full while the overlay uses only the main field", () => {
+    const summary = `Eigene Zusammenfassung: ${"Zusammenfassung ".repeat(30)}Ende.`;
+    const mounted = mount("<p>Ausführliche Bewertung</p>", true, undefined, { raw: summary });
+
+    expect(mounted.preview().textContent).toBe(summary);
+    expect(mounted.preview().classList.contains("richtextpreview-preview--summary")).toBe(true);
+    mounted.openButton().click();
+    expect(mounted.content().textContent).toBe("Ausführliche Bewertung");
+    expect(mounted.content().textContent).not.toContain("Eigene Zusammenfassung");
+    expect(mounted.control.getOutputs()).toEqual({});
+    expect(mounted.notify).not.toHaveBeenCalled();
+});
+
+test.each([null, "", " \n "])("an empty optional summary (%j) preserves the existing preview", (raw) => {
+    const mounted = mount("A".repeat(300), true, undefined, { raw });
+
+    expect(mounted.preview().textContent).toBe(`${"A".repeat(240)}…`);
+    expect(mounted.preview().classList.contains("richtextpreview-preview--summary")).toBe(false);
+    expect(mounted.content().textContent).toBe("A".repeat(300));
+});
+
+test("HTML in the summary is safely converted to preview text without embedded resources", () => {
+    const mounted = mount("Bewertung", true, undefined, {
+        raw: '<p onclick="alert(1)">Kurzfassung</p><p>Weitere Informationen</p><script>Verboten</script><img src="https://invalid.example/x">',
+    });
+
+    expect(mounted.preview().textContent).toBe("Kurzfassung Weitere Informationen");
+    expect(mounted.preview().childElementCount).toBe(0);
+    expect(mounted.container.textContent).not.toContain("Verboten");
+});
+
+test.each([null, ""])("a summary without overlay information (%j) remains visible without an open button", (raw) => {
+    const mounted = mount(raw, true, undefined, { raw: "Nur Zusammenfassung" });
+
+    expect(mounted.preview().textContent).toBe("Nur Zusammenfassung");
+    expect(mounted.openButton().hidden).toBe(true);
+    mounted.openButton().click();
+    expect(mounted.overlay().open).toBe(false);
+    expect(mounted.content().textContent).toBe("");
+});
+
+test("an unreadable summary is not replaced by a preview of the detailed assessment", () => {
+    const mounted = mount("Lesbare Bewertung", true, undefined, { raw: "Geheime Zusammenfassung", readable: false });
+
+    expect(mounted.preview().hidden).toBe(true);
+    expect(mounted.preview().textContent).toBe("");
+    expect(mounted.container.textContent).not.toContain("Geheime Zusammenfassung");
+    expect(mounted.container.textContent).toContain("Sie haben keine Berechtigung, diese Zusammenfassung zu lesen.");
+    expect(mounted.openButton().hidden).toBe(false);
+    mounted.openButton().click();
+    expect(mounted.content().textContent).toBe("Lesbare Bewertung");
+});
+
+test("a readable summary stays visible when the detailed assessment is unreadable", () => {
+    const mounted = mount("Geheime Bewertung", false, undefined, { raw: "Lesbare Zusammenfassung" });
+
+    expect(mounted.preview().hidden).toBe(false);
+    expect(mounted.preview().textContent).toBe("Lesbare Zusammenfassung");
+    expect(mounted.openButton().hidden).toBe(true);
+    expect(mounted.content().textContent).toBe("");
+    expect(mounted.container.textContent).not.toContain("Geheime Bewertung");
+    expect(mounted.container.textContent).toContain("Sie haben keine Berechtigung, diese Bewertung zu lesen.");
+});
+
+test("summary updates and permission changes do not replace the overlay content or reset its position", () => {
+    const mounted = mount("<p>Bewertung</p>", true, undefined, { raw: "Erste Zusammenfassung" });
+    mounted.openButton().click();
+    const paragraph = mounted.content().firstChild;
+    mounted.content().scrollTop = 42;
+    mounted.context.parameters.summary.raw = "Neue Zusammenfassung";
+
+    mounted.control.updateView(mounted.context);
+
+    expect(mounted.preview().textContent).toBe("Neue Zusammenfassung");
+    expect(mounted.content().firstChild).toBe(paragraph);
+    expect(mounted.content().scrollTop).toBe(42);
+
+    mounted.context.parameters.summary = mockProperty("Neue Zusammenfassung", undefined, { readable: false }) as IInputs["summary"];
+    mounted.control.updateView(mounted.context);
+    expect(mounted.preview().textContent).toBe("");
+    expect(mounted.container.textContent).not.toContain("Neue Zusammenfassung");
+    expect(mounted.overlay().open).toBe(true);
+    expect(mounted.content().scrollTop).toBe(42);
+
+    mounted.context.parameters.summary = mockProperty("Wieder lesbar") as IInputs["summary"];
+    mounted.control.updateView(mounted.context);
+    expect(mounted.preview().textContent).toBe("Wieder lesbar");
+    expect(mounted.preview().hidden).toBe(false);
+    expect(mounted.container.querySelector(".richtextpreview-message")?.hasAttribute("hidden")).toBe(true);
 });

@@ -6,11 +6,14 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="KIBewertungOverlay" xml:space="preserve"><value>MODUS KI Bewertung Overlay</value></data>
   <data name="KIBewertungOverlay_Description" xml:space="preserve"><value>MODUS KI Bewertung</value></data>
-  <data name="Property_Display_Key" xml:space="preserve"><value>Text</value></data>
-  <data name="Property_Desc_Key" xml:space="preserve"><value>Das gebundene mehrzeilige Textfeld, das schreibgeschützt angezeigt wird.</value></data>
+  <data name="Property_Display_Key" xml:space="preserve"><value>Overlayinformationen</value></data>
+  <data name="Property_Desc_Key" xml:space="preserve"><value>Mehrzeiliges Textfeld mit der vollständigen Bewertung für das Overlay. Ohne gefüllte Zusammenfassung wird daraus auch die Formularvorschau erzeugt.</value></data>
+  <data name="Summary_Display_Key" xml:space="preserve"><value>Zusammenfassung</value></data>
+  <data name="Summary_Desc_Key" xml:space="preserve"><value>Optionales mehrzeiliges Textfeld für die Formularvorschau. Ein gefüllter Wert wird vollständig angezeigt. Ohne Zuordnung oder bei leerem Wert wird die bisherige Kurzvorschau der Overlayinformationen verwendet.</value></data>
   <data name="KIBewertungOverlay_Open" xml:space="preserve"><value>Vollständige KI-Bewertung anzeigen</value></data>
   <data name="KIBewertungOverlay_Close" xml:space="preserve"><value>Schließen</value></data>
   <data name="KIBewertungOverlay_DialogTitle" xml:space="preserve"><value>MODUS KI Bewertung</value></data>
   <data name="KIBewertungOverlay_Empty" xml:space="preserve"><value>Keine Bewertungsinformationen vorhanden.</value></data>
   <data name="KIBewertungOverlay_PermissionDenied" xml:space="preserve"><value>Sie haben keine Berechtigung, diese Bewertung zu lesen.</value></data>
+  <data name="KIBewertungOverlay_SummaryPermissionDenied" xml:space="preserve"><value>Sie haben keine Berechtigung, diese Zusammenfassung zu lesen.</value></data>
 </root>

@@ -1,4 +1,4 @@
-# MODUS KI Bewertung Overlay PCF
+ # MODUS KI Bewertung Overlay PCF
 
 The requested target is a reusable model-driven field control for bound
 multiline text. The PCF reads and displays the value only; it does not edit the
@@ -110,3 +110,30 @@ the target environment remains runtime-not-checked.
 - Fix: HTML normal umbrechen, Klartext weiter pre-wrap; leere p/div/span/h* entfernen; div/span/hr erlaubt; einheitliche Abstände.
 - Gates grün (18 Tests); Browserprüfung 2000x716: Abstände 8-20 px, letzter Absatz nach Scrollen sichtbar.
 - Dynamics-Laufzeit: runtime-not-checked.
+
+## 1.0.0.8 / PCF 0.0.9 - separates Zusammenfassungsfeld
+
+Unattended default: Feldzuordnung und Altverhalten -> optionales gebundenes
+Multiline-Feld `summary`; bestehendes Pflichtfeld `text` unverändert
+(keine neue Umgebung oder Formularbindung angefordert).
+Unattended default: leere oder nicht zugeordnete Zusammenfassung ->
+bisherige 240-Zeichen-Vorschau; ein gefüllter eigener Zusammenfassungstext
+wird vollständig und ohne Höhenbegrenzung auf dem Formular angezeigt.
+Der aktualisierte Intent und der generierte Plan sind grün und gelten für
+diese additive, nicht destruktive Erweiterung als freigegeben.
+
+Die Felder werden unabhängig auf Leseberechtigung geprüft. Bei gesperrter
+Zusammenfassung gibt es keinen Rückgriff auf den Bewertungstext.
+Overlayinhalt und Scrollposition ändern sich nicht bei Zusammenfassungsupdates.
+Keine Änderungen an Umgebung, Formularbindung oder Datensätzen.
+
+Validierung: Gates grün mit 28 Tests, Produktionsbuild erfolgreich.
+Strikter Manifestvergleich zu Release-Commit c15ab08 (PCF 0.0.8) ohne
+Breaking Changes. Managed Solution 1.0.0.8 enthält PCF 0.0.9 und beide
+Multiline-Properties; gepacktes Bundle entspricht dem lokal geprüften Build.
+Browserprüfung bei 1440x800 und 390x600: 659 Zeichen Zusammenfassung
+vollständig sichtbar ohne horizontales Überlaufen; separates Overlay mit
+60 Abschnitten bis zum letzten Absatz scrollbar; Änderung der Zusammenfassung
+erhält Overlay-DOM und Scrollposition; leere Zusammenfassung nutzt Altverhalten.
+Lokale Prüfung mit synthetischen Daten, keine Dynamics-Laufzeitprüfung:
+runtime-not-checked. Power Pages und Canvas-Apps nicht Ziel dieser Version.
